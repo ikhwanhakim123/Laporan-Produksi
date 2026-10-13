@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agen Laporan Produksi</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#EEF1F2;--panel:#fff;--ink:#14222B;--mute:#5E6E78;--line:#D5DDE1;--accent:#E8A800;--accent-ink:#1A1400;--navy:#12384D;--ok:#2F8F4E;--bad:#C4472B;--badbg:#FBE6E1;--warnbg:#FFF3CC;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E181E;--panel:#16252E;--ink:#E6EEF1;--mute:#93A5AF;--line:#294050;--navy:#9CC7DD;--badbg:#4A2119;--warnbg:#4A3E10;--bad:#FF8B70}}
+:root[data-theme="dark"]{--bg:#0E181E;--panel:#16252E;--ink:#E6EEF1;--mute:#93A5AF;--line:#294050;--navy:#9CC7DD;--badbg:#4A2119;--warnbg:#4A3E10;--bad:#FF8B70}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 Barlow,system-ui,sans-serif}
+h1,h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;margin:0}
+h1{font-size:30px}h2{font-size:21px}
+header{padding:20px 20px 4px;max-width:1240px;margin:auto}
+header p{margin:2px 0 0;color:var(--mute);max-width:72ch}
+main{max-width:1240px;margin:auto;padding:12px 20px 32px;display:grid;gap:16px;grid-template-columns:340px 1fr;align-items:start}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.col{display:grid;gap:16px;min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+label{display:block;font-weight:600;font-size:13px;margin:12px 0 4px}
+textarea,input.f,select.f{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:14px}
+textarea{height:120px;resize:vertical;font-size:13px}
+button{font:inherit;cursor:pointer;border-radius:8px;padding:10px 14px;border:1px solid var(--line);background:transparent;color:var(--ink);font-weight:600;width:100%;margin-top:8px}
+button.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.nv{background:var(--navy);color:var(--panel);border-color:var(--navy);width:auto;margin:8px 8px 0 0}
+button.ln{width:auto;margin:8px 8px 0 0}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+details{margin-top:12px;font-size:13px}summary{cursor:pointer;font-weight:600}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:12px;text-align:center;color:var(--mute)}
+.drop img{max-width:100%;max-height:200px;border-radius:6px;display:block;margin:8px auto 0}
+#st{margin:0 0 12px;font-size:14px;padding:10px 12px;border-left:4px solid var(--accent);background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:6px;grid-column:1/-1}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th{font:600 13px Barlow,sans-serif;text-align:left;color:var(--mute);padding:4px}
+td{padding:2px 4px}
+td.n{white-space:nowrap}
+td input{width:70px;padding:7px 6px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--ink);font:inherit;text-align:right}
+td input.err{background:var(--badbg);border-color:var(--bad)}
+td input.warn{background:var(--warnbg);border-color:var(--accent)}
+td.m{font-size:12.5px;color:var(--mute)}td.m.e{color:var(--bad)}
+tfoot td{font-weight:700;border-top:2px solid var(--line);padding-top:6px}
+.chk{margin:12px 0;padding:10px 12px;border-radius:8px;font-size:14px;background:var(--bg)}
+.chk.ok{border-left:4px solid var(--ok)}.chk.bad{border-left:4px solid var(--bad)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.note{grid-column:1/-1;color:var(--mute);font-size:13px}
+.empty{color:var(--mute);padding:24px 0;text-align:center}
+.wr{margin-top:20px;padding-top:14px;border-top:1px solid var(--line)}
+.ck{display:flex;gap:8px;align-items:flex-start;font-weight:500;margin:8px 0}
+.ck input{margin-top:4px}
+.pl td{font-size:13px;padding:3px 6px;border-bottom:1px solid var(--line)}
+.pl td.sk{color:var(--mute)}.pl td.w{font-weight:600}
+.pl{min-width:520px}
+.sum{margin:10px 0;font-size:14px}
+</style>
+</head>
+<body>
+<header>
+<h1>Agen Laporan Produksi</h1>
+<p>Foto formulir produksi alat, ambil hanya kolom Jumlah 20" dan 40", sejajarkan dengan nama di Google Sheets, lalu tulis ke kolom tanggal yang tepat setelah Anda setujui.</p>
+</header>
+<main>
+<div id="st" role="status">Menyiapkan...</div>
+<div class="col">
+<section class="panel" aria-label="Sheet">
+<h2>1. Sheet</h2>
+<label for="sid">Spreadsheet (URL atau ID)</label>
+<input class="f" id="sid" value="https://docs.google.com/spreadsheets/d/122XnTSRp0P9f90sccTaf6UBZLybvkw9rbJsO4GPt2a0/edit">
+<div class="row2">
+<div><label for="tab">Tab</label><select class="f" id="tab"></select></div>
+<div><label for="grp">Group</label><select class="f" id="grp"></select></div>
+</div>
+<div class="row2">
+<div><label for="tg">Tanggal</label><select class="f" id="tg"></select></div>
+<div><label for="sh">Isi SHFT (opsional)</label><input class="f" id="sh" placeholder="kosong = tidak diisi"></div>
+</div>
+<button id="load">Muat dari Sheet</button>
+<details><summary>Daftar nama manual (tanpa Sheet)</summary>
+<textarea id="names" aria-label="Daftar nama manual"></textarea>
+</details>
+</section>
+
+<section class="panel" aria-label="Foto">
+<h2>2. Foto formulir</h2>
+<div class="drop"><input type="file" id="fi" accept="image/*" aria-label="Pilih foto formulir"><img id="pv" alt="Pratinjau" hidden></div>
+<label class="ck"><input type="checkbox" id="auto" checked> Tulis otomatis ke Sheet setelah dibaca (hanya jika semua pemeriksaan lolos)</label>
+<button class="pri" id="read" disabled>Baca dengan AI</button>
+<button id="demo">Pakai data contoh (tidak bisa ditulis ke Sheet)</button>
+</section>
+</div>
+
+<section class="panel" aria-label="Hasil">
+<h2>3. Hasil sejajar dengan daftar nama</h2>
+<div id="out"><p class="empty">Belum ada data.</p></div>
+</section>
+
+<p class="note">Agen hanya membaca kolom Jumlah dan Total per baris di kertas. Hasil diperiksa tiga cara: 20" + 40" harus sama dengan Total baris, jumlah kolom harus sama dengan baris TOTAL di kertas, dan tiap nama harus ketemu pasangannya. Penulisan ke Sheet hanya mengisi sel kosong, tidak pernah menimpa rumus, dan selalu menunggu persetujuan Anda.</p>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const SERVER='Google Sheets';
+const NAMES=`Julham Oktavia Hasibuan
+Mhd Afdillah Fauzi
+Sarwedi Siringo-Ringo
+Ramot Manurung
+Haris Syahputra Pulungan
+M. Agus Suhendra
+Ibrahim
+Syahrizal
+Sudirman Sagala
+Putra Iskandar Muda
+Wahyudi Nasution
+Amir Hamzah
+Erwin Siagian
+Muhammad Andika
+Dede Rinaldi
+Riyan Rivaldi
+Irsan
+Ridwan Zulhendra Simarmata
+Bagus Abdillah
+Marrowan P Malau
+Agus Suriwayadi
+Doni Tri Pendi Purba`;
+$('names').value=NAMES;
+
+let res=[],paper=null,paperTot=null,extra=[],file=null,isDemo=false;
+let sample=null,downloads=null,mcp=null,canImg=false;
+let tabs=[],tab='',groups=[],dates=[],plan=null,busy=false;
+
+/* ---------- util ---------- */
+const status=t=>{$('st').textContent=t};
+const asObj=p=>{if(typeof p==='string'){try{return JSON.parse(p)}catch(e){return{}}}return p||{}};
+const q=t=>"'"+String(t).replace(/'/g,"''")+"'";
+function colLetter(n){let s='';n++;while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s}
+function sid(){const v=$('sid').value.trim();const m=v.match(/\/d\/([a-zA-Z0-9_-]+)/);return m?m[1]:v}
+async function call(tool,input){const r=await mcp.callTool(SERVER,tool,input,{cache:false});return r.payload}
+function errText(e){const c=e&&e.code;
+  if(c==='needs_reauth')return'Sambungan Google Sheets habis. Sambungkan ulang di claude.ai: Pengaturan, Konektor.';
+  if(c==='server_not_connected'||c==='selection_required')return'Konektor Google Sheets belum tersambung. Tambahkan di claude.ai: Pengaturan, Konektor.';
+  if(c==='not_in_manifest'||c==='consent_required'||c==='not_granted')return'Akses ke Google Sheets belum Anda izinkan untuk halaman ini. Izinkan, lalu klik Muat dari Sheet.';
+  if(c==='blocked_by_policy')return'Kebijakan organisasi memblokir akses ini.';
+  if(c==='approval_required')return'Perlu persetujuan Anda untuk panggilan ini. Klik tombol lagi dan pilih Izinkan.';
+  if(c==='tool_error')return'Google Sheets menolak permintaan: '+(e.message||'');
+  if(c==='server_unavailable')return'Google Sheets tidak merespons. Coba lagi sebentar lagi.';
+  return'Gagal ('+(c||'error')+'): '+((e&&e.message)||'')}
+
+/* ---------- pencocokan nama ---------- */
+const norm=s=>String(s||'').toLowerCase().replace(/[^a-z\s]/g,' ').replace(/\s+/g,' ').trim();
+function bg(s){const t=' '+s+' ',o={};for(let i=0;i<t.length-1;i++){const g=t.slice(i,i+2);o[g]=(o[g]||0)+1}return o}
+function dice(a,b){a=norm(a);b=norm(b);if(!a||!b)return 0;const x=bg(a),y=bg(b);let n=0,sx=0,sy=0;
+  for(const k in x){sx+=x[k];if(y[k])n+=Math.min(x[k],y[k])}for(const k in y)sy+=y[k];return 2*n/(sx+sy)}
+const num=v=>{if(v===null||v===undefined||v==='')return null;const n=+String(v).replace(/[^0-9.-]/g,'');return isFinite(n)&&String(v).match(/\d/)?n:null};
+
+function match(master,rows){
+  const pairs=[];
+  master.forEach((m,i)=>rows.forEach((p,j)=>pairs.push([dice(m,p.operator),i,j])));
+  pairs.sort((a,b)=>b[0]-a[0]);
+  const mi={},pj={};
+  pairs.forEach(([s,i,j])=>{if(s>=.55&&!(i in mi)&&!(j in pj)){mi[i]={j,s};pj[j]=1}});
+  res=master.map((name,i)=>{const h=mi[i];const p=h?rows[h.j]:null;
+    return{name,c20:p?num(p.c20):null,c40:p?num(p.c40):null,tot:p?num(p.total):null,found:!!p,score:h?h.s:0,paperName:p?p.operator:''}});
+  extra=rows.filter((p,j)=>!(j in pj)&&(num(p.c20)!==null||num(p.c40)!==null));
+}
+function rowIssues(r){
+  const e=[];
+  if(!r.found)e.push(['m','Nama tidak ditemukan di kertas (kosong?)']);
+  else if(r.score<.8)e.push(['w',`Dicocokkan dengan "${r.paperName}", cek`]);
+  if(r.tot!==null){const s=(r.c20||0)+(r.c40||0);if(s!==r.tot)e.push(['e',`20"+40" = ${s}, di kertas ${r.tot}`])}
+  return e;
+}
+
+/* ---------- struktur sheet ---------- */
+function curGroup(){return groups[+$('grp').value]||null}
+function masterNames(){const g=curGroup();return g?g.names:$('names').value.split('\n').map(s=>s.trim()).filter(Boolean)}
+function parseGroups(rows){
+  const out=[];let cur=null;
+  rows.forEach((r,i)=>{
+    const a=String((r&&r[0])??'').trim(),b=String((r&&r[1])??'').trim();
+    if(/^group\b/i.test(a)){cur={label:a,header:i+1,names:[],rows:[],open:true};out.push(cur);return}
+    if(cur&&cur.open){if(b){cur.names.push(b);cur.rows.push(i+1)}else if(cur.names.length)cur.open=false}
+  });
+  return out;
+}
+function fillSelect(el,items,ph){el.innerHTML=(ph?`<option value="">${esc(ph)}</option>`:'')+items.map(([v,t])=>`<option value="${esc(v)}">${esc(t)}</option>`).join('')}
+
+async function connect(){
+  if(!mcp){status('Koneksi ke Google Sheets tidak tersedia di tampilan ini. Anda masih bisa memakai daftar nama manual dan menyalin hasilnya.');return}
+  status('Menghubungkan ke Google Sheets...');
+  try{
+    const p=asObj(await call('get_spreadsheet',{spreadsheetId:sid(),fields:['properties.title','sheets.properties.title']}));
+    tabs=(p.sheets||[]).map(s=>s.properties&&s.properties.title).filter(Boolean);
+    if(!tabs.length){status('Spreadsheet terbaca tapi tidak ada tab.');return}
+    fillSelect($('tab'),tabs.map(t=>[t,t]));
+    await loadTab();
+    status(`Terhubung ke "${(p.properties&&p.properties.title)||'spreadsheet'}", tab ${tabs.length}. Pilih group dan tanggal, lalu baca foto.`);
+  }catch(e){status(errText(e))}
+}
+async function loadTab(){
+  tab=$('tab').value;plan=null;
+  const ab=asObj(await call('get_values',{spreadsheetId:sid(),range:`${q(tab)}!A1:B150`}));
+  const rows=ab.values||[];
+  groups=parseGroups(rows);
+  dates=[];
+  const dr=rows.findIndex(r=>/^tanggal$/i.test(String((r&&r[0])??'').trim()));
+  if(dr>=0){
+    const d=asObj(await call('get_values',{spreadsheetId:sid(),range:`${q(tab)}!A${dr+1}:CZ${dr+1}`}));
+    const row=(d.values||[[]])[0]||[];
+    row.forEach((v,i)=>{const s=String(v??'').trim();if(i>=2&&/^\d{1,2}$/.test(s))dates.push({label:s,col:i})});
+  }
+  fillSelect($('grp'),groups.map((g,i)=>[i,`${g.label} (baris ${g.rows[0]}-${g.rows[g.rows.length-1]}, ${g.names.length} nama)`]));
+  fillSelect($('tg'),dates.map((d,i)=>[i,`${d.label} (kolom ${colLetter(d.col)})`]),'pilih tanggal');
+  if(paper){match(masterNames(),paper);render()}
+}
+
+/* ---------- foto ---------- */
+async function shrink(f){
+  try{const bm=await createImageBitmap(f);const m=2000,s=Math.min(1,m/Math.max(bm.width,bm.height));
+    const c=document.createElement('canvas');c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);
+    c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+    const b=await new Promise(r=>c.toBlob(r,'image/jpeg',.9));return b||f}catch(e){return f}
+}
+async function read(){
+  if(!file||!sample)return;
+  const master=masterNames();
+  if(!master.length){status('Daftar nama masih kosong.');return}
+  $('read').disabled=true;status('Claude sedang membaca formulir... (bisa sampai satu menit)');
+  const prompt=`Gambar adalah foto formulir kertas produksi operator alat di terminal petikemas. Foto mungkin terputar 90 derajat, baca dengan orientasi yang benar.
+Ambil HANYA: nama operator tiap baris, kolom "JUMLAH" bagian 20" dan 40", kolom "TOTAL" di paling kanan untuk tiap baris, dan baris "TOTAL" paling bawah (jumlah 20", jumlah 40", total).
+Abaikan kolom EXPORT, IMPORT, RELOKASI, FULL, EMPTY, dan kolom ALAT.
+Kembalikan HANYA JSON:
+{"rows":[{"operator":"","c20":null,"c40":null,"total":null}],"totals":{"c20":null,"c40":null,"total":null}}
+Aturan: satu objek per baris operator yang namanya tertulis, urut dari atas. Angka berupa bilangan bulat; sel yang kosong atau tidak terbaca diisi null. Jangan menjumlah atau mengoreksi sendiri, salin apa adanya dari kertas. Tulis nama operator seperti tercetak di kertas.`;
+  try{
+    const img=await shrink(file);
+    const d=await sample.json(prompt,{images:[img],modelTier:'default'});
+    isDemo=false;
+    paper=(d.rows||[]).map(r=>({operator:r.operator,c20:r.c20,c40:r.c40,total:r.total}));
+    match(master,paper);paperTot=d.totals||null;render();
+    status(`Terbaca ${paper.length} baris dari kertas. Periksa kotak pemeriksaan, lalu tinjau penulisan ke Sheet.`);
+    await autoWrite();
+  }catch(e){status(e.code==='not_granted'?'Izin ke Claude ditolak. Anda masih bisa memakai data contoh.':'Gagal membaca ('+(e.code||'error')+'). Coba foto yang lebih jelas.')}
+  finally{$('read').disabled=false}
+}
+
+async function autoWrite(){
+  if(!$('auto').checked||!mcp||!curGroup())return;
+  if($('tg').value===''){status('Foto terbaca. Pilih tanggal dulu, lalu klik Tinjau penulisan ke Sheet.');return}
+  if(!checksOk){status('Foto terbaca, tetapi pemeriksaan belum lolos, jadi tidak ditulis otomatis. Periksa tabel, lalu tinjau dan setujui manual.');return}
+  await review();
+  if(plan&&plan.some(p=>p.cells.some(c=>c.action==='write')))await go();
+}
+
+/* ---------- tabel hasil ---------- */
+function render(){
+  if(!res.length){$('out').innerHTML='<p class="empty">Belum ada data.</p>';return}
+  const g=curGroup();
+  $('out').innerHTML=`<div id="chk"></div><div class="tw"><table><thead><tr><th>${g?'Baris':'#'}</th><th>Nama</th><th>20"</th><th>40"</th><th>Pemeriksaan</th></tr></thead>
+  <tbody>${res.map((r,i)=>`<tr data-i="${i}"><td>${g?g.rows[i]:i+1}</td><td class="n">${esc(r.name)}</td>
+  <td><input data-i="${i}" data-k="c20" inputmode="numeric" value="${r.c20??''}" aria-label="20 inci ${esc(r.name)}"></td>
+  <td><input data-i="${i}" data-k="c40" inputmode="numeric" value="${r.c40??''}" aria-label="40 inci ${esc(r.name)}"></td><td class="m"></td></tr>`).join('')}</tbody>
+  <tfoot><tr><td></td><td>Jumlah</td><td id="s20"></td><td id="s40"></td><td></td></tr></tfoot></table></div>
+  <div><button class="nv" id="cp">Salin angka (20" dan 40")</button><button class="ln" id="cn">Salin dengan nama</button><button class="nv" id="xl">Unduh Excel</button></div>
+  <div class="wr"><h2>4. Tulis ke Sheet</h2>
+  <label class="ck"><input type="checkbox" id="ow"> Timpa angka yang sudah ada (rumus tidak pernah ditimpa)</label>
+  <button class="pri" id="rv">Tinjau penulisan ke Sheet</button><div id="plan"></div></div>`;
+  refresh();
+}
+let checksOk=false;
+function refresh(){
+  res.forEach((r,i)=>{const tr=document.querySelector(`tr[data-i="${i}"]`);if(!tr)return;const e=rowIssues(r);
+    const bad=e.some(x=>x[0]==='e');
+    tr.querySelectorAll('input').forEach(inp=>inp.className=bad?'err':(e.length?'warn':''));
+    const td=tr.querySelector('td.m');td.textContent=e.map(x=>x[1]).join('; ');td.className='m'+(bad?' e':'')});
+  const s20=res.reduce((a,r)=>a+(r.c20||0),0),s40=res.reduce((a,r)=>a+(r.c40||0),0);
+  $('s20').textContent=s20;$('s40').textContent=s40;
+  let msgs=[],ok=true;
+  if(paperTot&&paperTot.c20!=null&&paperTot.c40!=null){
+    const a=s20===paperTot.c20,b=s40===paperTot.c40;
+    msgs.push(`Jumlah kolom: 20" ${s20} (kertas ${paperTot.c20}), 40" ${s40} (kertas ${paperTot.c40}) ${a&&b?'→ cocok':'→ TIDAK cocok'}`);if(!(a&&b))ok=false}
+  else msgs.push('Baris TOTAL di kertas tidak terbaca, jumlah kolom belum bisa dicek.');
+  const bad=res.filter(r=>rowIssues(r).some(x=>x[0]==='e')).length;
+  if(bad){ok=false;msgs.push(`${bad} baris tidak cocok dengan Total di kertas.`)}
+  if(extra.length){ok=false;msgs.push('Baris di kertas yang tidak cocok dengan daftar nama: '+extra.map(x=>`${x.operator} (${x.c20??'-'}/${x.c40??'-'})`).join(', '))}
+  checksOk=ok;
+  $('chk').className='chk '+(ok?'ok':'bad');$('chk').innerHTML=msgs.map(esc).join('<br>');
+}
+
+/* ---------- salin / unduh ---------- */
+const dateLabel=()=>{const i=$('tg').value;return i!==''&&dates[+i]?dates[+i].label:''};
+function lines(withName){return res.map(r=>(withName?r.name+'\t':'')+(r.c20??'')+'\t'+(r.c40??'')).join('\n')}
+async function copy(t){try{await navigator.clipboard.writeText(t);status('Tersalin. Tempel di kolom tanggal '+dateLabel()+' pada sheet Anda.')}catch(e){
+  const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');status('Tersalin.')}catch(_){status('Gagal menyalin, salin manual dari tabel.')}ta.remove()}}
+async function xlsx(){
+  if(!downloads||!window.XLSX){status('Unduh Excel tidak tersedia di tampilan ini. Pakai tombol salin.');return}
+  const aoa=[['Tanggal',dateLabel(),'Shift',$('sh').value],[],['No','Nama','20"','40"'],...res.map((r,i)=>[i+1,r.name,r.c20??'',r.c40??''])];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),'Produksi '+dateLabel());
+  const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  try{await downloads.save({filename:`produksi-tgl-${dateLabel()||'x'}.xlsx`,data:new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})});status('File siap disimpan.')}catch(e){status('Unduhan dibatalkan.')}
+}
+
+/* ---------- tulis ke Sheet ---------- */
+function cellState(c){
+  const v=c&&c.userEnteredValue;
+  if(!v)return{kind:'empty',val:''};
+  if(v.formulaValue!==undefined)return{kind:'formula',val:v.formulaValue};
+  if(v.numberValue!==undefined)return{kind:'value',val:v.numberValue};
+  if(v.stringValue!==undefined&&v.stringValue!=='')return{kind:'value',val:v.stringValue};
+  if(v.boolValue!==undefined)return{kind:'value',val:v.boolValue};
+  return{kind:'empty',val:''};
+}
+async function readTarget(g,dc){
+  const first=g.rows[0],last=g.rows[g.rows.length-1];
+  const rng=`${q(tab)}!${colLetter(dc)}${first}:${colLetter(dc+2)}${last}`;
+  const p=asObj(await call('get_spreadsheet',{spreadsheetId:sid(),includeGridData:true,ranges:[rng],fields:['sheets.data.rowData.values.userEnteredValue']}));
+  const rd=(((p.sheets||[])[0]||{}).data||[])[0];
+  const rows=(rd&&rd.rowData)||[];
+  return g.rows.map(r=>{const vals=(rows[r-first]&&rows[r-first].values)||[];return[0,1,2].map(k=>cellState(vals[k]))});
+}
+async function buildPlan(){
+  const g=curGroup(),di=$('tg').value;
+  if(!g||di==='')throw{code:'local',message:'Pilih group dan tanggal dulu.'};
+  const dc=dates[+di].col;
+  const cur=await readTarget(g,dc);
+  const shift=$('sh').value.trim(),ow=$('ow').checked;
+  const out=[];
+  res.forEach((r,i)=>{
+    if(r.c20===null&&r.c40===null)return;
+    const row=g.rows[i],want=[];
+    if(shift)want.push([0,num(shift)!==null&&/^\d+$/.test(shift)?+shift:shift]);
+    if(r.c20!==null)want.push([1,r.c20]);
+    if(r.c40!==null)want.push([2,r.c40]);
+    const cells=want.map(([k,v])=>{
+      const ex=cur[i][k];let action='write',reason='kosong, akan diisi';
+      if(ex.kind==='formula'){action='skip';reason='berisi rumus'}
+      else if(ex.kind!=='empty'){
+        if(String(ex.val)===String(v)){action='skip';reason='sudah sama'}
+        else if(!ow){action='skip';reason='sudah terisi'}
+        else reason='ditimpa'}
+      return{col:dc+k,addr:colLetter(dc+k)+row,row,old:ex.kind==='empty'?'':ex.val,val:v,action,reason};
+    });
+    out.push({row,name:r.name,cells});
+  });
+  return out;
+}
+const sig=p=>p.flatMap(x=>x.cells.filter(c=>c.action==='write').map(c=>c.addr+'='+c.val)).join('|');
+function renderPlan(done){
+  const el=$('plan');if(!el)return;
+  if(!plan){el.innerHTML='';return}
+  const all=plan.flatMap(p=>p.cells.map(c=>({...c,name:p.name})));
+  const w=all.filter(c=>c.action==='write').length,s=all.length-w;
+  const none=res.filter(r=>r.c20===null&&r.c40===null).length;
+  el.innerHTML=`<div class="sum"><b>${w}</b> sel akan ditulis, <b>${s}</b> dilewati, ${none} baris tanpa angka tidak disentuh.${done?' Penulisan selesai.':''}</div>
+  <div class="tw"><table class="pl"><thead><tr><th>Sel</th><th>Nama</th><th>Sekarang</th><th>Jadi</th><th>Status</th></tr></thead><tbody>
+  ${all.map(c=>`<tr><td class="${c.action==='write'?'w':'sk'}">${c.addr}</td><td class="${c.action==='write'?'':'sk'}">${esc(c.name)}</td><td class="sk">${esc(c.old)}</td><td class="${c.action==='write'?'w':'sk'}">${esc(c.val)}</td><td class="${c.action==='write'?'':'sk'}">${esc(c.reason)}</td></tr>`).join('')}
+  </tbody></table></div>
+  ${!done&&w?`${checksOk?'':'<label class="ck"><input type="checkbox" id="force"> Pemeriksaan di atas belum lolos, saya sudah memeriksa dan tetap ingin menulis</label>'}
+  <button class="pri" id="go">Setujui dan tulis ${w} sel ke tab ${esc(tab)}</button>`:''}`;
+}
+async function review(){
+  if(busy)return;
+  if(isDemo){status('Data contoh tidak boleh ditulis ke Sheet. Baca foto sungguhan dulu.');return}
+  if(!mcp||!curGroup()){status('Sheet belum terhubung. Klik Muat dari Sheet, atau salin angka secara manual.');return}
+  busy=true;status('Membaca isi sel tujuan di Sheet...');
+  try{plan=await buildPlan();renderPlan();status('Periksa rincian di bawah. Belum ada yang ditulis.')}
+  catch(e){plan=null;renderPlan();status(e.code==='local'?e.message:errText(e))}
+  finally{busy=false}
+}
+async function go(){
+  if(busy||!plan)return;
+  if(!checksOk&&!($('force')&&$('force').checked)){status('Centang konfirmasi dulu karena pemeriksaan belum lolos.');return}
+  busy=true;$('go').disabled=true;
+  try{
+    status('Memeriksa ulang sel tujuan sebelum menulis...');
+    const fresh=await buildPlan();
+    if(sig(fresh)!==sig(plan)){plan=fresh;renderPlan();status('Isi sheet berubah sejak Anda meninjau. Periksa rincian terbaru, lalu setujui lagi.');return}
+    const runs=[];
+    plan.forEach(p=>{
+      const ws=p.cells.filter(c=>c.action==='write').sort((a,b)=>a.col-b.col);
+      let cur=null;
+      ws.forEach(c=>{if(cur&&c.col===cur.end+1){cur.end=c.col;cur.vals.push(c.val)}else{cur={row:p.row,start:c.col,end:c.col,vals:[c.val]};runs.push(cur)}});
+    });
+    let n=0,rowsDone=0;
+    for(const r of runs){
+      status(`Menulis ${++rowsDone} dari ${runs.length}...`);
+      const a=colLetter(r.start)+r.row,b=colLetter(r.end)+r.row;
+      try{await call('update_values',{spreadsheetId:sid(),range:`${q(tab)}!${a}${r.start===r.end?'':':'+b}`,values:[r.vals]});n+=r.vals.length}
+      catch(e){plan=await buildPlan().catch(()=>null);renderPlan();status(`Berhenti di ${a}: ${errText(e)} ${n} sel sudah tertulis sebelumnya, rincian di bawah menunjukkan kondisi terbaru. Tidak diulang otomatis.`);return}
+    }
+    try{await mcp.invalidate()}catch(e){}
+    plan=await buildPlan();
+    const ok=plan.every(p=>p.cells.every(c=>c.action==='skip'));
+    renderPlan(true);
+    status(ok?`Selesai: ${n} sel ditulis dan sudah dicek ulang dari Sheet. Buka sheet untuk melihat total.`:`Selesai menulis ${n} sel, tetapi ada sel yang belum sesuai saat dicek ulang. Periksa rincian.`);
+  }catch(e){status(e.code==='local'?e.message:errText(e))}
+  finally{busy=false;const b=$('go');if(b)b.disabled=false}
+}
+
+/* ---------- data contoh ---------- */
+const DEMO=[['Julham Oktavia Hasibuan',4,11,15],['MHD Afdillah Fauzi',16,11,27],['Sarwedi Siringo-ringo',32,null,32],['Ramot Manurung',26,6,32],['Haris Syahputra Pulungan',20,6,26],['M. Agus Suhendra',6,8,14],['Ibrahim',8,10,18],['Syahrizal',16,6,22],['Sudirman Sagala',16,10,26],['Putra Iskandar Muda',23,3,26],['Wahyudi Nasution',6,9,15],['Erwin Siagian',34,6,40],['Muhammad Andika',12,7,19],['Dede Rinaldi',39,2,41],['Riyan Rivaldi',7,8,15],['Irsan',2,6,8],['Ridwan Zulhendra Simarmata',10,1,11],['Bagus Abdillah',16,6,22],['Agus Suriwayadi',32,3,35],['Doni Tri Pendi Purba',27,5,32]];
+function demo(){
+  isDemo=true;
+  paper=DEMO.map(d=>({operator:d[0],c20:d[1],c40:d[2],total:d[3]}));
+  match(masterNames(),paper);
+  paperTot={c20:352,c40:124,total:476};render();status('Data contoh dimuat dari formulir yang sudah diverifikasi. Mode contoh tidak bisa menulis ke Sheet.');
+}
+
+/* ---------- event ---------- */
+$('fi').onchange=e=>{file=e.target.files[0]||null;const p=$('pv');
+  if(file){p.src=URL.createObjectURL(file);p.hidden=false;$('read').disabled=!canImg;if(!canImg)status('Pembacaan foto tidak tersedia di tampilan ini. Gunakan data contoh.')}
+  else{p.hidden=true;$('read').disabled=true}};
+$('read').onclick=read;$('demo').onclick=demo;$('load').onclick=connect;
+$('tab').onchange=()=>loadTab().catch(e=>status(errText(e)));
+$('grp').onchange=()=>{plan=null;if(paper){match(masterNames(),paper);render()}};
+$('names').oninput=()=>{if(!curGroup()&&paper){match(masterNames(),paper);render()}};
+['tg','sh'].forEach(id=>$(id).addEventListener('input',()=>{plan=null;renderPlan()}));
+$('out').addEventListener('input',e=>{const t=e.target;if(t.id==='ow'){plan=null;renderPlan();return}
+  if(!t.dataset.k)return;const r=res[+t.dataset.i];r[t.dataset.k]=num(t.value);plan=null;renderPlan();refresh()});
+$('out').addEventListener('click',e=>{const id=e.target.id;
+  if(id==='cp')copy(lines(false));if(id==='cn')copy(lines(true));if(id==='xl')xlsx();
+  if(id==='rv')review();if(id==='go')go()});
+
+(async()=>{
+  try{downloads=await claude.use('downloads')}catch(e){}
+  try{sample=await claude.use('sample');if(sample){const l=await sample.limits().catch(()=>null);canImg=!!(l&&l.images);if(file)$('read').disabled=!canImg}}catch(e){}
+  try{mcp=await claude.use('mcp')}catch(e){}
+  if(!sample)status('Pembacaan foto tidak tersedia di tampilan ini. Anda bisa mencoba dengan data contoh.');
+  await connect();
+})();
+</script>
+</body>
+</html>
