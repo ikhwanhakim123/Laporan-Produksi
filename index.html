@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agen Laporan Produksi</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+<div class="hero-in">
+<div>
+<h1>Agen Laporan Produksi</h1>
+<p>Foto formulir operator Terberg PMT, ambil kolom Jumlah 20" dan 40", lalu isi otomatis ke Google Sheets pada tanggal yang tepat.</p>
+</div>
+<ol class="steps" aria-label="Langkah"><li data-s="1">Sheet</li><li data-s="2">Foto</li><li data-s="3">Tulis</li></ol>
+</div>
+</header>
+
+<main>
+<div id="st" role="status" data-k="">Menyiapkan...</div>
+
+<div class="col">
+<section class="panel" aria-label="Sheet">
+<div class="ph"><span class="num">1</span><h2>Sheet</h2></div>
+<label for="sid">Spreadsheet (URL atau ID)</label>
+<input class="f" id="sid" value="https://docs.google.com/spreadsheets/d/122XnTSRp0P9f90sccTaf6UBZLybvkw9rbJsO4GPt2a0/edit">
+<div class="row2">
+<div><label for="tab">Tab</label><select class="f" id="tab"></select></div>
+<div><label for="grp">Group</label><select class="f" id="grp"></select></div>
+</div>
+<div class="row2">
+<div><label for="tg">Tanggal</label><select class="f" id="tg"></select></div>
+<div><label for="sh">Isi SHFT (opsional)</label><input class="f" id="sh" placeholder="kosong = tidak diisi"></div>
+</div>
+<button id="load">Muat ulang dari Sheet</button>
+<details><summary>Daftar nama manual (tanpa Sheet)</summary>
+<textarea id="names" aria-label="Daftar nama manual"></textarea>
+</details>
+</section>
+
+<section class="panel" aria-label="Foto">
+<div class="ph"><span class="num">2</span><h2>Foto formulir</h2></div>
+<label class="drop" id="drop" for="fi" style="margin-top:6px;font-weight:400">
+<input type="file" id="fi" accept="image/*">
+<img id="pv" alt="Pratinjau formulir" hidden>
+<span id="dt"><b>Pilih foto</b> atau seret ke sini</span>
+</label>
+<label class="ck"><input type="checkbox" id="auto" checked> Tulis otomatis ke Sheet setelah dibaca, jika semua pemeriksaan lolos</label>
+<button class="pri" id="read" disabled>Baca dengan AI</button>
+<button id="demo">Pakai data contoh (tidak ditulis ke Sheet)</button>
+</section>
+</div>
+
+<section class="panel" aria-label="Hasil">
+<div class="ph"><span class="num">3</span><h2>Hasil dan penulisan</h2></div>
+<div id="out"><p class="empty">Belum ada data. Pilih tanggal, unggah foto, lalu klik Baca dengan AI.</p></div>
+</section>
+
+<p class="note">Agen hanya membaca kolom Jumlah dan Total per baris di kertas. Hasil diperiksa tiga cara: 20" + 40" harus sama dengan Total baris, jumlah kolom harus sama dengan baris TOTAL di kertas, dan tiap nama harus ketemu pasangannya. Penulisan hanya mengisi sel kosong dan tidak pernah menimpa rumus.</p>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
